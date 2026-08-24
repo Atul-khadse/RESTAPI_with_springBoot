@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -15,4 +17,7 @@ public class User {
   private Long id;
     private String name;
     private String email;
+
+
+
 }

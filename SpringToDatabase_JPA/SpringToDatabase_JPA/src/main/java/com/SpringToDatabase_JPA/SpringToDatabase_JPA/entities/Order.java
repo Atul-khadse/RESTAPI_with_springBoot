@@ -11,7 +11,7 @@ import lombok.Setter;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String productName;
 
     @ManyToOne(fetch = FetchType.LAZY)

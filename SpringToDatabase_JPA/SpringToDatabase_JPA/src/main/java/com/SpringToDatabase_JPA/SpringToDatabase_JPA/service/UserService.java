@@ -6,6 +6,10 @@ import com.SpringToDatabase_JPA.SpringToDatabase_JPA.entities.User;
 import com.SpringToDatabase_JPA.SpringToDatabase_JPA.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,5 +71,19 @@ public class UserService {
 
     public void deleteUserById(Long id) {
         userRepository.deleteById(id);
+    }
+
+    public  List<UserDto> getUserPaginated(int page, int pageSize, String direction, String sortBy) {
+
+        Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending():
+        Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page,pageSize,sort);
+        Page<User> userPage = userRepository.findAll(pageable);
+
+        List<UserDto> userDtoList = new ArrayList<>();
+        userPage.forEach(user -> userDtoList.add(new UserDto(user.getId(),user.getName(),user.getEmail())));
+
+        return userDtoList;
     }
 }

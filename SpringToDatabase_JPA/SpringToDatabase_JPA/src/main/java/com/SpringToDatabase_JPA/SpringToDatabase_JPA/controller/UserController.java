@@ -3,6 +3,7 @@ package com.SpringToDatabase_JPA.SpringToDatabase_JPA.controller;
 import com.SpringToDatabase_JPA.SpringToDatabase_JPA.dto.CreateUserDto;
 import com.SpringToDatabase_JPA.SpringToDatabase_JPA.dto.UserDto;
 import com.SpringToDatabase_JPA.SpringToDatabase_JPA.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.webmvc.autoconfigure.WebMvcProperties;
@@ -20,7 +21,7 @@ public class UserController {
 
 
      @PostMapping("/create")
-     public ResponseEntity<UserDto> createUser(@RequestBody CreateUserDto createUserDto){
+     public ResponseEntity<UserDto> createUser(@Valid @RequestBody CreateUserDto createUserDto){
           return ResponseEntity.status(HttpStatus.CREATED).body(userService.saveUser(createUserDto));
      }
 

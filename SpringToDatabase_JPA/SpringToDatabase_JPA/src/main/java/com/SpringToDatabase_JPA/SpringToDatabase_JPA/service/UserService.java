@@ -3,6 +3,7 @@ package com.SpringToDatabase_JPA.SpringToDatabase_JPA.service;
 import com.SpringToDatabase_JPA.SpringToDatabase_JPA.dto.CreateUserDto;
 import com.SpringToDatabase_JPA.SpringToDatabase_JPA.dto.UserDto;
 import com.SpringToDatabase_JPA.SpringToDatabase_JPA.entities.User;
+import com.SpringToDatabase_JPA.SpringToDatabase_JPA.exception.UserNotFoundException;
 import com.SpringToDatabase_JPA.SpringToDatabase_JPA.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.jspecify.annotations.Nullable;
@@ -43,7 +44,7 @@ public class UserService {
     }
 
     public UserDto getUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow();
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with id"));
         return new UserDto(user.getId(),user.getName(),user.getEmail());
     }
 

@@ -20,10 +20,10 @@ public class UserController {
      private final UserService userService;
 
 
-     @PostMapping("/create")
-     public ResponseEntity<UserDto> createUser(@Valid @RequestBody CreateUserDto createUserDto){
-          return ResponseEntity.status(HttpStatus.CREATED).body(userService.saveUser(createUserDto));
-     }
+//     @PostMapping("/create")
+//     public ResponseEntity<UserDto> createUser(@Valid @RequestBody CreateUserDto createUserDto){
+//          return ResponseEntity.status(HttpStatus.CREATED).body(userService.saveUser(createUserDto));
+//     }
 
 
 

@@ -1,20 +1,28 @@
 package com.SpringToDatabase_JPA.SpringToDatabase_JPA.security;
 
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+//@EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+   private final JwtAuthFilter jwtAuthFilter;
+
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
@@ -22,10 +30,20 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(HttpMethod.POST,"/api/v1/auth/**").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/api/v1/users").permitAll()
-                                .requestMatchers("/api/v1/users/*/orders/**").hasAnyRole("ADMIN","USER")
+//                                USER
+                                .requestMatchers("/api/v1/users/me").hasRole("USER")
+//                                ADMIN
                                 .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
-                                .anyRequest().authenticated());
+                                //ORDERS USER
+                                .requestMatchers(HttpMethod.POST,"/api/v1/orders").hasRole("USER")
+                                .requestMatchers("/api/v1/orders/my/**").hasAnyRole("USER")
+
+                                //ORDER ADMIN
+                                .requestMatchers(HttpMethod.GET,"/api/v1/orders").hasRole("ADMIN")
+                                .requestMatchers("/api/v1/orders/user/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/api/v1/orders/**").hasRole("ADMIN")
+                                .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 // this is for basic user and password while not JWT       .httpBasic(Customizer.withDefaults());
 
         return httpSecurity.build();
@@ -57,9 +75,8 @@ public class SecurityConfig {
     }
 
 
-
     @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration authconfig){
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authconfig) {
         return authconfig.getAuthenticationManager();
     }
 

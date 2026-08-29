@@ -10,9 +10,11 @@ import com.SpringToDatabase_JPA.SpringToDatabase_JPA.entities.User;
 import com.SpringToDatabase_JPA.SpringToDatabase_JPA.repository.UserRepository;
 import com.SpringToDatabase_JPA.SpringToDatabase_JPA.security.JwtService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import java.util.Objects;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
@@ -42,13 +45,29 @@ public class AuthService {
 
 
     public LoginResponseDto login(LoginDto loginDto){
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
-        );
+        log.info("Attempting login for user email: {}", loginDto.getEmail());
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
+            );
 
-        String jwtToken = jwtService.generateJwToken((UserDetails) Objects.requireNonNull(authentication.getPrincipal()));
+            log.info("Authentication successful for user: {}", loginDto.getEmail());
 
-        return new LoginResponseDto(jwtToken);
+            String jwtToken = jwtService.generateJwToken((UserDetails) Objects.requireNonNull(authentication.getPrincipal()));
+
+            log.info("JWT Token generated successfully for user: {}", loginDto.getEmail());
+            return new LoginResponseDto(jwtToken);
+
+        } catch (AuthenticationException e) {
+            // Catches BadCredentialsException, LockedException, DisabledException, etc.
+            log.error("Authentication failed for user [{}]: {}", loginDto.getEmail(), e.getMessage());
+            throw e;
+
+        }
+        catch (Exception e){
+            log.error("Internal system error during login process for user [{}]: ", loginDto.getEmail(), e);
+            throw e;
+        }
 
     }
 

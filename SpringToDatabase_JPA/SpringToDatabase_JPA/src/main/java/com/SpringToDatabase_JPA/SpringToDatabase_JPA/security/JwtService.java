@@ -1,5 +1,6 @@
 package com.SpringToDatabase_JPA.SpringToDatabase_JPA.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,11 +20,23 @@ public class JwtService {
     }
 
     public String generateJwToken(UserDetails userDetails){
+
+        long expirationTimeInMs = 1000 * 60 * 15;
+
         return Jwts.builder().subject(userDetails.getUsername())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() * 1000 * 60 * 15))
+                .expiration(new Date(System.currentTimeMillis()  + expirationTimeInMs))
                 .signWith(getKey())
                 .compact();
+    }
+
+
+    public Claims parseToken(String token){
+        return Jwts.parser()
+                .verifyWith(getKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
 

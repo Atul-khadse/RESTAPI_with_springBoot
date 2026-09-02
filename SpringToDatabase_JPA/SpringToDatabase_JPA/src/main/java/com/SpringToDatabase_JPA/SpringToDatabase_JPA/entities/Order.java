@@ -16,7 +16,7 @@ public class Order {
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id")
-    private String product;
+    private Product product;
 
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal priceAtPurchase;
@@ -25,6 +25,17 @@ public class Order {
     private User user;
 
 
+    public String getProductName() {
+        return this.product != null ? this.product.getName() : null;
+    }
 
+    // ADD THIS MANUALLY: Satisfies order.setProductName() in your service
+    public void setProductName(String productName) {
+        if (this.product == null) {
+            this.product = new Product();
+        }
+        this.product.setName(productName);
+
+    }
 
 }

@@ -50,4 +50,42 @@ public class OrderService {
         });
         return orderDtos;
     }
+
+
+
+
+    public List<OrderDto> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        List<OrderDto> orderDtos = new ArrayList<>();
+
+        orders.forEach(order -> {
+            OrderDto orderDto = new OrderDto(
+                    order.getId(),
+                    order.getProductName(),
+                    new UserDto(
+                            order.getUser().getId(),
+                            order.getUser().getName(),
+                            order.getUser().getEmail()
+                    )
+            );
+            orderDtos.add(orderDto);
+        });
+        return orderDtos;
+    }
+
+
+
+
+
+
+    public void deleteOrder(Long id) {
+        if (!orderRepository.existsById(id)) {
+            throw new UserNotFoundException("Order not found with id: " + id);
+        }
+        orderRepository.deleteById(id);
+    }
+
+
+
+
 }

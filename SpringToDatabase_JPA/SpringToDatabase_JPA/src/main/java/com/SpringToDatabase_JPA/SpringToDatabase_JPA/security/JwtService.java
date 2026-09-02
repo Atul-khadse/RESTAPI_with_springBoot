@@ -21,7 +21,7 @@ public class JwtService {
 
     public String generateJwToken(UserDetails userDetails){
 
-        long expirationTimeInMs = 1000 * 60 * 15;
+        long expirationTimeInMs = 1000 * 60 * 60;
 
         return Jwts.builder().subject(userDetails.getUsername())
                 .issuedAt(new Date())
